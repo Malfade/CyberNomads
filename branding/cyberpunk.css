@@ -570,6 +570,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  padding: 0.75rem 1.75rem !important;
   clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
 
@@ -609,31 +610,147 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ——— Auth pages ——— */
 
-body.cp-page-auth main .container {
-  max-width: 480px;
+body.cp-page-auth main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: 2rem 1rem 3rem;
+}
+
+body.cp-page-auth main > .container.cp-auth-panel {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 1.5rem;
   animation: cp-auth-in 0.7s ease both;
+  overflow: visible;
+}
+
+body.cp-page-auth main > .container .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+body.cp-page-auth .cp-auth-form-col {
+  padding: 0;
+}
+
+.cp-auth-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--cp-border-dim);
+}
+
+.cp-auth-label {
+  display: block;
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+  color: var(--cp-red);
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.cp-auth-title {
+  font-family: "Orbitron", sans-serif !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em;
+  color: var(--cp-yellow) !important;
+  text-shadow: 0 0 18px var(--cp-glow-yellow);
+  margin: 0 !important;
+  text-transform: uppercase;
+}
+
+body.cp-page-auth .jumbotron {
+  display: none !important;
+}
+
+body.cp-page-auth .cp-auth-form .form-label {
+  font-family: "Orbitron", sans-serif !important;
+  font-size: 0.62rem !important;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cp-cyan) !important;
+  margin-bottom: 0.45rem;
+}
+
+body.cp-page-auth .cp-auth-form .mb-3 {
+  margin-bottom: 1.1rem !important;
+}
+
+body.cp-page-auth .cp-auth-form .form-control {
+  min-height: 46px;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--cp-border-dim);
+  transition: border-color 0.2s, box-shadow 0.2s, border-left-color 0.2s;
+}
+
+body.cp-page-auth .cp-auth-form .form-control:focus {
+  border-left-color: var(--cp-yellow);
+}
+
+body.cp-page-auth .cp-auth-form .form-text {
+  font-size: 0.65rem;
+  color: var(--cp-text-dim) !important;
+  margin-top: 0.35rem;
+  letter-spacing: 0.04em;
+}
+
+body.cp-page-auth .cp-auth-actions-row {
+  margin-top: 0.5rem;
+}
+
+body.cp-page-auth .cp-auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+body.cp-page-auth .cp-auth-btn-wrap {
+  width: 100%;
+}
+
+body.cp-page-auth .cp-auth-submit,
+body.cp-page-auth form .btn-primary {
+  width: 100% !important;
+  clip-path: none !important;
+  padding: 0.95rem 1.5rem !important;
+  min-height: 48px;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 20px var(--cp-glow-yellow);
+}
+
+body.cp-page-auth .cp-auth-submit:hover,
+body.cp-page-auth form .btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+body.cp-page-auth .cp-auth-link-wrap {
+  text-align: center;
+}
+
+body.cp-page-auth .cp-auth-link-wrap a {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--cp-cyan) !important;
+  text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+body.cp-page-auth .cp-auth-link-wrap a:hover {
+  color: var(--cp-yellow) !important;
+  text-shadow: 0 0 10px var(--cp-glow-yellow);
 }
 
 @keyframes cp-auth-in {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-body.cp-page-auth .jumbotron,
-body.cp-page-auth .card {
-  background: var(--cp-bg-panel) !important;
-  border: 1px solid var(--cp-border-dim) !important;
-  border-radius: 0 !important;
-  position: relative;
-}
-
-body.cp-page-auth main .container::before {
-  content: "ACCESS NODE // AUTH";
-  display: block;
-  font-size: 0.6rem;
-  letter-spacing: 0.3em;
-  color: var(--cp-red);
-  margin-bottom: 0.75rem;
 }
 
 body.cp-page-auth .form-control {
@@ -642,6 +759,7 @@ body.cp-page-auth .form-control {
 
 body.cp-page-auth .form-control:nth-of-type(1) { animation-delay: 0.2s; }
 body.cp-page-auth .form-control:nth-of-type(2) { animation-delay: 0.35s; }
+body.cp-page-auth .form-control:nth-of-type(3) { animation-delay: 0.5s; }
 
 @keyframes cp-field-in {
   from { opacity: 0; transform: translateX(-12px); }
@@ -651,12 +769,12 @@ body.cp-page-auth .form-control:nth-of-type(2) { animation-delay: 0.35s; }
 body.cp-page-auth::before {
   content: "";
   position: fixed;
-  bottom: 10%;
-  right: 5%;
-  width: 100px;
-  height: 100px;
+  bottom: 8%;
+  right: 6%;
+  width: 120px;
+  height: 120px;
   background: url("/themes/core/static/cyberpunk/hood-yellow.png") center/contain no-repeat;
-  opacity: 0.15;
+  opacity: 0.12;
   pointer-events: none;
   z-index: 0;
   animation: cp-skull-float 6s ease-in-out infinite;

@@ -165,9 +165,71 @@
 
   function wrapAuthPanel() {
     if (pageType() !== "auth") return;
-    var container = document.querySelector("main .container");
+    var container = document.querySelector("main > .container");
     if (!container || container.classList.contains("cp2077-wrapped")) return;
-    container.classList.add("cp2077-frame", "cp2077-wrapped");
+
+    var jumbotron = document.querySelector("main .jumbotron");
+    var titleEl = jumbotron ? jumbotron.querySelector("h1") : null;
+    var titleText = titleEl ? titleEl.textContent.trim() : "ACCESS";
+
+    container.classList.add("cp2077-frame", "cp2077-wrapped", "cp-auth-panel");
+
+    var header = document.createElement("div");
+    header.className = "cp-auth-header";
+    header.innerHTML =
+      '<div class="cp-auth-label">ACCESS NODE // AUTH</div>' +
+      '<h2 class="cp-auth-title">' + titleText + "</h2>";
+    container.insertBefore(header, container.firstChild);
+
+    if (jumbotron) jumbotron.style.display = "none";
+
+    container.querySelectorAll("[class*='offset-']").forEach(function (el) {
+      el.className = el.className.replace(/\boffset-\S+/g, "").replace(/\s+/g, " ").trim();
+    });
+
+    var innerCol = container.querySelector(".row > [class*='col-']");
+    if (innerCol) innerCol.className = "col-12 cp-auth-form-col";
+
+    var form = container.querySelector("form");
+    if (!form) {
+      addFrameCorners();
+      return;
+    }
+
+    form.classList.add("cp-auth-form");
+    var submitBtn = form.querySelector('[type="submit"]');
+    if (!submitBtn) {
+      addFrameCorners();
+      return;
+    }
+
+    submitBtn.classList.add("cp-auth-submit");
+    var submitRow = submitBtn.closest(".row");
+    if (!submitRow) {
+      addFrameCorners();
+      return;
+    }
+
+    var forgotLink = submitRow.querySelector("a");
+    var actions = document.createElement("div");
+    actions.className = "cp-auth-actions";
+
+    var btnWrap = document.createElement("div");
+    btnWrap.className = "cp-auth-btn-wrap";
+    btnWrap.appendChild(submitBtn);
+    actions.appendChild(btnWrap);
+
+    if (forgotLink) {
+      var linkWrap = document.createElement("div");
+      linkWrap.className = "cp-auth-link-wrap";
+      linkWrap.appendChild(forgotLink);
+      actions.appendChild(linkWrap);
+    }
+
+    submitRow.innerHTML = "";
+    submitRow.className = "cp-auth-actions-row";
+    submitRow.appendChild(actions);
+
     addFrameCorners();
   }
 
