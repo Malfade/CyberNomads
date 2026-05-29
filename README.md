@@ -145,8 +145,25 @@ python3 scripts/apply-branding.py
 ```
 Проверить статус: `docker compose ps`
 
-**Порт 8000 занят**  
-Измените в `docker-compose.yml` строку `"8000:8000"` на `"8080:8000"` и обновите `BASE_URL` в `scripts/apply-branding.py`.
+**Порт 8000 занят** (`Bind for 0.0.0.0:8000 failed`)  
+Часто запущены **два** проекта сразу (`60297002` и `CyberNomads`). Оставьте один:
+
+```bash
+# кто занял порт
+docker ps --format 'table {{.Names}}\t{{.Ports}}' | grep 8000
+
+# остановить старый стек (пример)
+cd /home/nundusk/60297002 && docker compose down
+# или
+cd /home/nundusk/CyberNomads && docker compose down
+
+# затем поднять только нужную папку
+cd /home/nundusk/CyberNomads
+docker compose up -d
+```
+
+Либо другой порт в `docker-compose.yml`: `"8080:8000"` и  
+`CTFD_URL=http://localhost:8080 python3 scripts/apply-branding.py`
 
 **`Can't create database 'ctfd' (errno: 2)` в логах**  
 Повреждён или недоступен каталог `data/mysql`. На сервере:
@@ -161,15 +178,14 @@ bash scripts/fix-permissions.sh
 docker compose down && docker compose up -d
 ```
 
-**500 на /login или /admin**  
-Часто из‑за пустого `ctf_logo` или прав на `data/uploads`. На сервере:
+**500 — Internal Server Error**  
+Чаще всего битый путь к логотипу в БД или права на `data/uploads`:
 ```bash
-docker compose logs ctfd --tail 50
-bash scripts/fix-permissions.sh
-docker compose restart ctfd
-sleep 20
+cd ~/CyberNomads   # ваша папка проекта
+bash scripts/fix-500.sh
 python3 scripts/apply-branding.py
 ```
+Вручную посмотреть причину: `docker compose logs ctfd --tail 80`
 
 **Сброс к чистой установке**  
 ```bash
