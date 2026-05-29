@@ -127,6 +127,16 @@ sessionStorage.removeItem('cp-loaded')
 **CTFd не открывается сразу после старта**  
 Подождите 20–30 секунд и проверьте логи: `docker compose logs ctfd`
 
+**`apply-branding.py` падает на homepage / JSONDecodeError**  
+CTFd не прошёл setup или неверный логин админа:
+```bash
+# Откройте в браузере и создайте админа:
+# http://YOUR_HOST:8000/setup
+# Email: admin@skysoc.local  Password: SkySOC2026!
+python3 scripts/apply-branding.py
+```
+Либо измените `ADMIN_EMAIL` / `ADMIN_PASSWORD` в `scripts/apply-branding.py`.
+
 **`apply-branding.py` падает с Connection refused**  
 CTFd не запущен. Выполните:
 ```bash

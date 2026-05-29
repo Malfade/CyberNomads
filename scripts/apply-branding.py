@@ -102,6 +102,7 @@ def extract_nonce(html: str) -> str | None:
         r'name="nonce"[^>]*value="([^"]+)"',
         r"csrfNonce': '([^']+)'",
         r'csrfNonce\': "([^"]+)"',
+        r'csrfNonce": "([^"]+)"',
     ):
         match = re.search(pattern, html)
         if match:
@@ -109,14 +110,69 @@ def extract_nonce(html: str) -> str | None:
     return None
 
 
+def is_setup_complete(session: requests.Session) -> bool:
+    resp = session.get(f"{BASE_URL}/", allow_redirects=True, timeout=10)
+    return "/setup" not in resp.url and "setup" not in resp.text.lower()[:2000]
+
+
+def get_csrf(session: requests.Session) -> str:
+    cached = getattr(session, "_cp_csrf", None)
+    if cached:
+        return cached
+
+    for path in ("/admin/config", "/admin", "/challenges", "/"):
+        resp = session.get(f"{BASE_URL}{path}", timeout=10)
+        nonce = extract_nonce(resp.text)
+        if nonce:
+            session._cp_csrf = nonce
+            return nonce
+
+    raise RuntimeError("Could not obtain CSRF token — are you logged in as admin?")
+
+
 def api_headers(session: requests.Session) -> dict:
-    resp = session.get(f"{BASE_URL}/login")
-    nonce = extract_nonce(resp.text) or ""
     return {
         "Content-Type": "application/json",
-        "CSRF-Token": nonce,
+        "CSRF-Token": get_csrf(session),
         "Accept": "application/json",
     }
+
+
+def api_json(
+    session: requests.Session, method: str, url: str, **kwargs
+) -> dict:
+    resp = session.request(
+        method, url, headers=api_headers(session), timeout=30, **kwargs
+    )
+    content_type = resp.headers.get("Content-Type", "")
+    if "json" not in content_type:
+        snippet = resp.text[:500].replace("\n", " ")
+        raise RuntimeError(
+            f"API {method} {url} → HTTP {resp.status_code} ({content_type})\n"
+            f"  {snippet}"
+        )
+    try:
+        return resp.json()
+    except requests.JSONDecodeError as exc:
+        raise RuntimeError(f"API {method} {url} returned invalid JSON") from exc
+
+
+def verify_admin(session: requests.Session) -> None:
+    session._cp_csrf = None
+    get_csrf(session)
+    resp = session.patch(
+        f"{BASE_URL}/api/v1/configs/ctf_name",
+        json={"value": CTF_NAME},
+        headers=api_headers(session),
+    )
+    if resp.status_code not in (200, 204):
+        raise RuntimeError(
+            "Admin API access failed (not logged in as admin).\n"
+            f"  1. Open {BASE_URL}/setup and finish setup if this is a new install\n"
+            f"  2. Use admin: {ADMIN_EMAIL} / {ADMIN_PASSWORD}\n"
+            f"  3. Or update credentials in apply-branding.py\n"
+            f"  Response: HTTP {resp.status_code} {resp.text[:200]}"
+        )
 
 
 def build_theme_header() -> str:
@@ -169,17 +225,35 @@ def patch_config(session: requests.Session, key: str, value: str) -> None:
 
 
 def patch_homepage(session: requests.Session) -> None:
-    pages = session.get(
-        f"{BASE_URL}/api/v1/pages", headers=api_headers(session)
-    ).json()
-    page_id = next(p["id"] for p in pages["data"] if p["route"] == "index")
-    resp = session.patch(
-        f"{BASE_URL}/api/v1/pages/{page_id}",
-        json={"content": HOMEPAGE_HTML, "title": CTF_NAME},
-        headers=api_headers(session),
-    )
-    if resp.status_code not in (200, 204):
-        raise RuntimeError(f"Failed to update homepage: {resp.status_code}")
+    data = api_json(session, "GET", f"{BASE_URL}/api/v1/pages")
+    pages = data.get("data") or []
+    index = next((p for p in pages if p.get("route") == "index"), None)
+
+    payload = {
+        "content": HOMEPAGE_HTML,
+        "title": CTF_NAME,
+        "format": "html",
+        "draft": False,
+    }
+
+    if index:
+        page_id = index["id"]
+        resp = session.patch(
+            f"{BASE_URL}/api/v1/pages/{page_id}",
+            json=payload,
+            headers=api_headers(session),
+        )
+    else:
+        print("  Index page missing — creating...")
+        payload["route"] = "index"
+        resp = session.post(
+            f"{BASE_URL}/api/v1/pages",
+            json=payload,
+            headers=api_headers(session),
+        )
+
+    if resp.status_code not in (200, 201, 204):
+        raise RuntimeError(f"Failed to update homepage: {resp.status_code} {resp.text[:300]}")
 
 
 def ctfd_is_ready() -> bool:
@@ -248,10 +322,11 @@ def login(session: requests.Session) -> None:
                 allow_redirects=True,
                 timeout=10,
             )
-            if "login" in resp.url:
+            if "login" in resp.url.split("?")[0]:
                 raise RuntimeError(
                     "Login failed — check ADMIN_EMAIL / ADMIN_PASSWORD in apply-branding.py"
                 )
+            session._cp_csrf = None
             return
         except RuntimeError:
             raise
@@ -277,8 +352,19 @@ def main() -> int:
 
     session = requests.Session()
     wait_for_ctfd()
+
+    if not is_setup_complete(session):
+        print(
+            f"\nCTFd is not set up yet. Open in browser:\n  {BASE_URL}/setup\n\n"
+            f"Create admin with:\n  Email: {ADMIN_EMAIL}\n  Password: {ADMIN_PASSWORD}\n\n"
+            "Then run this script again.",
+            file=sys.stderr,
+        )
+        return 1
+
     print("Logging in...")
     login(session)
+    verify_admin(session)
 
     print("Setting logos...")
     sync_logos(session)
