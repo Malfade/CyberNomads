@@ -138,6 +138,19 @@ python3 scripts/apply-branding.py
 **Порт 8000 занят**  
 Измените в `docker-compose.yml` строку `"8000:8000"` на `"8080:8000"` и обновите `BASE_URL` в `scripts/apply-branding.py`.
 
+**`Can't create database 'ctfd' (errno: 2)` в логах**  
+Повреждён или недоступен каталог `data/mysql`. На сервере:
+```bash
+chmod +x scripts/reset-database.sh scripts/fix-permissions.sh
+bash scripts/reset-database.sh
+# после старта: /setup → создать админа → apply-branding.py
+```
+Если БД не нужно сбрасывать — только права:
+```bash
+bash scripts/fix-permissions.sh
+docker compose down && docker compose up -d
+```
+
 **500 на /login или /admin**  
 Часто из‑за пустого `ctf_logo` или прав на `data/uploads`. На сервере:
 ```bash

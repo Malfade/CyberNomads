@@ -20,7 +20,7 @@ services:
       - ./branding/assets/cyberpunk:/opt/CTFd/CTFd/themes/core/static/cyberpunk:ro
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       cache:
         condition: service_started
 
@@ -35,6 +35,12 @@ services:
       MARIADB_AUTO_UPGRADE: "1"
     volumes:
       - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
     command:
       - mysqld
       - --character-set-server=utf8mb4
