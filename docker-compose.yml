@@ -1,0 +1,49 @@
+services:
+  ctfd:
+    image: ctfd/ctfd:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      UPLOAD_FOLDER: /var/uploads
+      DATABASE_URL: mysql+pymysql://ctfd:ctfd@db/ctfd
+      REDIS_URL: redis://cache:6379
+      WORKERS: 1
+      LOG_FOLDER: /var/log/CTFd
+      ACCESS_LOG: "-"
+      ERROR_LOG: "-"
+      REVERSE_PROXY: "true"
+    volumes:
+      - ./data/logs:/var/log/CTFd
+      - ./data/uploads:/var/uploads
+      - ./branding/assets/cyberpunk:/opt/CTFd/CTFd/themes/core/static/cyberpunk:ro
+    depends_on:
+      db:
+        condition: service_started
+      cache:
+        condition: service_started
+
+  db:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ctfd
+      MARIADB_USER: ctfd
+      MARIADB_PASSWORD: ctfd
+      MARIADB_DATABASE: ctfd
+      MARIADB_AUTO_UPGRADE: "1"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --wait_timeout=28800
+      - --log-warnings=0
+
+  cache:
+    image: redis:4
+    restart: always
+    volumes:
+      - ./data/redis:/data

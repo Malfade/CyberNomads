@@ -1,1 +1,136 @@
-# CyberNomads
+# Cybernomads CTF
+
+Платформа Capture The Flag на базе [CTFd](https://ctfd.io/) с кастомной темой в стиле Cyberpunk 2077.
+
+## Требования
+
+- Docker
+- Docker Compose (v2+)
+- Python 3 + `requests` (для скрипта брендинга)
+
+```bash
+pip install requests
+```
+
+## Быстрый запуск
+
+```bash
+cd /path/to/60297002
+
+# Поднять CTFd, MariaDB и Redis
+docker compose up -d
+
+# Дождаться готовности (15–30 сек), затем применить тему
+python3 scripts/apply-branding.py
+```
+
+Откройте в браузере: **http://localhost:8000**
+
+## Первый запуск vs повторный
+
+| Ситуация | Что делать |
+|---|---|
+| **Первый запуск** (папка `data/` пустая) | После `docker compose up -d` откройте http://localhost:8000/setup и создайте админа **или** сразу запустите `apply-branding.py` — скрипт сам пройдёт setup, если он ещё не выполнен |
+| **Повторный запуск** | Достаточно `docker compose up -d`. Данные сохраняются в `data/` |
+
+## Доступ
+
+| | |
+|---|---|
+| **Сайт** | http://localhost:8000 |
+| **Админ-панель** | http://localhost:8000/admin |
+| **Email** | `admin@skysoc.local` |
+| **Пароль** | `SkySOC2026!` |
+
+> Смените пароль после первого входа: **Admin → Users → ваш аккаунт**.
+
+## Управление
+
+```bash
+# Статус контейнеров
+docker compose ps
+
+# Логи CTFd
+docker compose logs -f ctfd
+
+# Остановить
+docker compose down
+
+# Остановить и удалить данные (полный сброс!)
+docker compose down
+rm -rf data/
+
+# Перезапуск
+docker compose restart
+
+# Применить/обновить тему после правок CSS или homepage
+python3 scripts/apply-branding.py
+```
+
+## Структура проекта
+
+```
+60297002/
+├── docker-compose.yml      # CTFd + MariaDB + Redis
+├── .env                    # SECRET_KEY для сессий
+├── branding/
+│   ├── cyberpunk.css       # Стили темы
+│   ├── cyberpunk.js        # Анимации (loader, particles)
+│   └── assets/cyberpunk/   # Логотип, иконки, фоны (монтируется в контейнер)
+├── scripts/
+│   └── apply-branding.py   # Настройка темы через API CTFd
+└── data/                   # Персистентные данные (не коммитить!)
+    ├── mysql/              # База данных
+    ├── uploads/            # Загруженные файлы
+    ├── redis/
+    └── logs/
+```
+
+## Кастомизация темы
+
+1. Отредактируйте `branding/cyberpunk.css` и/или `branding/cyberpunk.js`
+2. При необходимости измените главную страницу и тексты в `scripts/apply-branding.py` (константы `HOMEPAGE_HTML`, `CTF_NAME` и т.д.)
+3. Положите новые статические файлы в `branding/assets/cyberpunk/`
+4. Примените изменения:
+
+```bash
+python3 scripts/apply-branding.py
+```
+
+Чтобы снова увидеть анимацию загрузки в браузере:
+
+```javascript
+sessionStorage.removeItem('cp-loaded')
+```
+
+## Сервисы в Docker Compose
+
+| Сервис | Образ | Порт |
+|---|---|---|
+| `ctfd` | `ctfd/ctfd:latest` | 8000 |
+| `db` | `mariadb:10.11` | 3306 (внутренний) |
+| `cache` | `redis:4` | 6379 (внутренний) |
+
+## Troubleshooting
+
+**CTFd не открывается сразу после старта**  
+Подождите 20–30 секунд и проверьте логи: `docker compose logs ctfd`
+
+**`apply-branding.py` падает с ошибкой login**  
+Убедитесь, что CTFd доступен на http://localhost:8000 и credentials в скрипте актуальны.
+
+**Порт 8000 занят**  
+Измените в `docker-compose.yml` строку `"8000:8000"` на `"8080:8000"` и обновите `BASE_URL` в `scripts/apply-branding.py`.
+
+**Сброс к чистой установке**  
+```bash
+docker compose down
+rm -rf data/
+docker compose up -d
+python3 scripts/apply-branding.py
+```
+
+## Лицензия и компоненты
+
+- CTFd — open source, см. [github.com/CTFd/CTFd](https://github.com/CTFd/CTFd)
+- Пиксельные иконки — HackerNoon Pixel Icon Library (Community)

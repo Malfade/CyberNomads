@@ -1,0 +1,853 @@
+/* Cybernomads — Cyberpunk 2077 UI inspired theme */
+
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap");
+
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
+  --cp-bg: #0a0e17;
+  --cp-bg-panel: rgba(10, 14, 24, 0.92);
+  --cp-bg-panel-2: rgba(16, 22, 36, 0.95);
+
+  --cp-cyan: #00f0ff;
+  --cp-yellow: #fcee0a;
+  --cp-red: #ff003c;
+  --cp-orange: #ff6a00;
+
+  --cp-text: #e8eaef;
+  --cp-text-dim: #6b7280;
+  --cp-text-cyan: #7dd3fc;
+
+  --cp-border: rgba(0, 240, 255, 0.45);
+  --cp-border-dim: rgba(0, 240, 255, 0.15);
+  --cp-border-yellow: rgba(252, 238, 10, 0.7);
+  --cp-glow-cyan: rgba(0, 240, 255, 0.25);
+  --cp-glow-yellow: rgba(252, 238, 10, 0.2);
+  --cp-glow-red: rgba(255, 0, 60, 0.2);
+
+  --theme-color: var(--cp-yellow);
+  --bs-body-bg: var(--cp-bg);
+  --bs-body-color: var(--cp-text);
+  --bs-primary: var(--cp-yellow);
+  --bs-link-color: var(--cp-cyan);
+  --bs-link-hover-color: var(--cp-yellow);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Share Tech Mono", "JetBrains Mono", monospace !important;
+  background: var(--cp-bg) !important;
+  color: var(--cp-text) !important;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 0, 60, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0, 240, 255, 0.06), transparent 50%),
+    linear-gradient(180deg, #0a0e17 0%, #0d1525 50%, #0a0e17 100%);
+  z-index: -3;
+  pointer-events: none;
+}
+
+body.cp-page-home::after,
+body.cp-page-auth::after,
+body.cp-page-challenges::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.12;
+  z-index: -2;
+  pointer-events: none;
+}
+
+body.cp-page-home::after { background-image: url("/themes/core/static/cyberpunk/hero-bg.jpg"); }
+body.cp-page-auth::after { background-image: url("/themes/core/static/cyberpunk/auth-bg.jpg"); }
+body.cp-page-challenges::after { background-image: url("/themes/core/static/cyberpunk/challenges-bg.jpg"); }
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Orbitron", sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ——— HUD frame utility ——— */
+
+.cp2077-frame {
+  position: relative;
+  background: var(--cp-bg-panel);
+  border: 1px solid var(--cp-border-dim);
+  padding: 1.25rem;
+}
+
+.cp2077-frame::before,
+.cp2077-frame::after,
+.cp2077-frame > .cp2077-corner-br,
+.cp2077-frame > .cp2077-corner-bl {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.cp2077-frame::before {
+  top: -1px; left: -1px;
+  border-top: 2px solid var(--cp-yellow);
+  border-left: 2px solid var(--cp-yellow);
+}
+
+.cp2077-frame::after {
+  top: -1px; right: -1px;
+  border-top: 2px solid var(--cp-cyan);
+  border-right: 2px solid var(--cp-cyan);
+}
+
+.cp2077-corner-br {
+  bottom: -1px; right: -1px;
+  border-bottom: 2px solid var(--cp-cyan);
+  border-right: 2px solid var(--cp-cyan);
+}
+
+.cp2077-corner-bl {
+  bottom: -1px; left: -1px;
+  border-bottom: 2px solid var(--cp-yellow);
+  border-left: 2px solid var(--cp-yellow);
+}
+
+.cp2077-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  color: var(--cp-cyan);
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.cp2077-head {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--cp-border-dim);
+  color: var(--cp-cyan);
+  margin-bottom: 1rem;
+}
+
+.cp2077-head--active {
+  background: var(--cp-yellow);
+  color: #000;
+  border-color: var(--cp-yellow);
+  box-shadow: 0 0 20px var(--cp-glow-yellow);
+}
+
+/* ——— Loader CP2077 ——— */
+
+#cp-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050810;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#cp-loader.cp-loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cp-loader-panel {
+  width: min(420px, 90vw);
+  padding: 2rem;
+  text-align: center;
+  animation: cp-panel-in 0.6s ease both;
+}
+
+@keyframes cp-panel-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.cp-loader-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+  display: block;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 12px var(--cp-glow-cyan));
+  animation: cp-icon-pulse 2s ease-in-out infinite;
+}
+
+.cp-loader-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--cp-yellow);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.25rem;
+  animation: cp-glitch 4s infinite;
+}
+
+.cp-loader-sub {
+  font-size: 0.7rem;
+  color: var(--cp-red);
+  letter-spacing: 0.3em;
+  margin-bottom: 1.5rem;
+}
+
+.cp-loader-bar {
+  height: 3px;
+  background: var(--cp-border-dim);
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.cp-loader-bar-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--cp-red), var(--cp-yellow), var(--cp-cyan));
+  animation: cp-load 1.6s ease-in-out forwards;
+  box-shadow: 0 0 12px var(--cp-glow-yellow);
+}
+
+@keyframes cp-load { to { width: 100%; } }
+
+.cp-loader-status {
+  font-size: 0.65rem;
+  color: var(--cp-text-dim);
+  letter-spacing: 0.2em;
+}
+
+@keyframes cp-glitch {
+  0%, 92%, 100% { transform: none; text-shadow: none; }
+  93% { transform: translate(-2px, 0); text-shadow: 2px 0 var(--cp-red); }
+  95% { transform: translate(2px, 0); text-shadow: -2px 0 var(--cp-cyan); }
+}
+
+.cp-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px, rgba(0, 0, 0, 0.04) 4px
+  );
+  opacity: 0.5;
+}
+
+#cp-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+}
+
+/* ——— Navbar HUD ——— */
+
+.navbar {
+  background: rgba(8, 12, 20, 0.95) !important;
+  border-bottom: 1px solid var(--cp-border-dim) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  padding: 0.35rem 0;
+}
+
+.navbar::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cp-yellow), var(--cp-cyan), transparent);
+  opacity: 0.5;
+}
+
+.navbar-brand .ctf_logo {
+  height: 36px !important;
+  width: auto;
+  filter: drop-shadow(0 0 8px var(--cp-glow-yellow));
+  image-rendering: pixelated;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  font-family: "Orbitron", sans-serif !important;
+  font-size: 0.7rem !important;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cp-text-dim) !important;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: var(--cp-yellow) !important;
+  text-shadow: 0 0 10px var(--cp-glow-yellow);
+}
+
+/* ——— Homepage CP2077 layout ——— */
+
+.cp2077-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+  animation: cp-shell-in 0.8s ease both;
+}
+
+@keyframes cp-shell-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cp2077-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--cp-border-dim);
+}
+
+.cp2077-topbar-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--cp-cyan);
+}
+
+.cp2077-title {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--cp-yellow);
+  text-shadow: 0 0 30px var(--cp-glow-yellow);
+  margin: 0.25rem 0 0;
+  line-height: 1.1;
+}
+
+.cp2077-subtitle {
+  font-size: 0.75rem;
+  color: var(--cp-red);
+  letter-spacing: 0.25em;
+  margin: 0.35rem 0 0;
+}
+
+.cp2077-topbar-deco {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.cp2077-inbox-item--active img {
+  filter: brightness(0);
+  opacity: 1;
+}
+
+.cp2077-stat-row img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px var(--cp-glow-red));
+  image-rendering: pixelated;
+}
+
+.cp2077-stat-row img[src*="icons/"] {
+  filter: drop-shadow(0 0 6px var(--cp-glow-cyan));
+}
+
+.cp2077-topbar-deco img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 8px var(--cp-glow-red));
+  animation: cp-icon-pulse 3s ease-in-out infinite;
+  image-rendering: pixelated;
+}
+
+.cp2077-topbar-deco img:nth-child(2) { animation-delay: 0.5s; }
+
+@keyframes cp-icon-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.cp2077-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 900px) {
+  .cp2077-grid {
+    grid-template-columns: 220px 1fr 200px;
+  }
+}
+
+.cp2077-inbox-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cp2077-inbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.35rem;
+  border: 1px solid var(--cp-border-dim);
+  color: var(--cp-text-dim);
+  text-decoration: none !important;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  transition: all 0.25s ease;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+
+.cp2077-inbox-item img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  opacity: 0.85;
+}
+
+.cp2077-inbox-item:hover {
+  border-color: var(--cp-cyan);
+  color: var(--cp-cyan);
+}
+
+.cp2077-inbox-item--active {
+  background: var(--cp-yellow) !important;
+  color: #000 !important;
+  border-color: var(--cp-yellow) !important;
+  font-weight: 700;
+  box-shadow: 0 0 16px var(--cp-glow-yellow);
+}
+
+.cp2077-main-body {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--cp-text-dim);
+  margin-bottom: 1.5rem;
+}
+
+.cp2077-main-body strong {
+  color: var(--cp-cyan);
+}
+
+.cp2077-skull {
+  display: block;
+  width: 100%;
+  max-width: 120px;
+  margin: 1rem auto 0;
+  opacity: 0.75;
+  filter: drop-shadow(0 0 12px var(--cp-glow-red));
+  animation: cp-skull-float 5s ease-in-out infinite;
+}
+
+@keyframes cp-skull-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.cp2077-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--cp-border-dim);
+  font-size: 0.7rem;
+  color: var(--cp-text-dim);
+}
+
+.cp2077-levels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.cp2077-level {
+  text-align: center;
+  padding: 0.4rem 0;
+  border: 1px solid var(--cp-border-dim);
+  font-size: 0.65rem;
+  color: var(--cp-text-dim);
+  letter-spacing: 0.1em;
+}
+
+.cp2077-level--on {
+  background: var(--cp-yellow);
+  color: #000;
+  border-color: var(--cp-yellow);
+  font-weight: 700;
+}
+
+/* ——— Buttons CP2077 ——— */
+
+.cp2077-btn,
+.cp-hero-btn {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  font-family: "Orbitron", sans-serif !important;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  transition: all 0.25s ease;
+}
+
+.cp2077-btn--primary,
+.cp-hero-btn {
+  background: var(--cp-yellow) !important;
+  color: #000 !important;
+  box-shadow: 0 0 20px var(--cp-glow-yellow);
+}
+
+.cp2077-btn--primary:hover,
+.cp-hero-btn:hover {
+  background: #fff !important;
+  box-shadow: 0 0 30px var(--cp-glow-yellow);
+  color: #000 !important;
+}
+
+.cp2077-btn--ghost {
+  background: transparent;
+  color: var(--cp-cyan) !important;
+  border: 1px solid var(--cp-border);
+  margin-top: 0.5rem;
+}
+
+.cp2077-btn--ghost:hover {
+  border-color: var(--cp-yellow);
+  color: var(--cp-yellow) !important;
+}
+
+.btn-primary {
+  background: var(--cp-yellow) !important;
+  border: none !important;
+  color: #000 !important;
+  font-family: "Orbitron", sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 20px var(--cp-glow-yellow);
+}
+
+.btn-dark,
+.challenge-button {
+  background: var(--cp-bg-panel-2) !important;
+  border: 1px solid var(--cp-border-dim) !important;
+  color: var(--cp-text) !important;
+  font-family: "Share Tech Mono", monospace !important;
+  font-size: 0.8rem;
+  border-radius: 0 !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.challenge-button:hover {
+  border-color: var(--cp-yellow) !important;
+  box-shadow: 0 0 16px var(--cp-glow-yellow), inset 0 0 20px rgba(252, 238, 10, 0.05);
+  color: var(--cp-yellow) !important;
+}
+
+.challenge-button.solved-challenge {
+  background: rgba(255, 0, 60, 0.12) !important;
+  border-color: rgba(255, 0, 60, 0.5) !important;
+  color: var(--cp-red) !important;
+}
+
+.challenge-button .corner-button-check {
+  color: var(--cp-red) !important;
+}
+
+/* ——— Auth pages ——— */
+
+body.cp-page-auth main .container {
+  max-width: 480px;
+  animation: cp-auth-in 0.7s ease both;
+}
+
+@keyframes cp-auth-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.cp-page-auth .jumbotron,
+body.cp-page-auth .card {
+  background: var(--cp-bg-panel) !important;
+  border: 1px solid var(--cp-border-dim) !important;
+  border-radius: 0 !important;
+  position: relative;
+}
+
+body.cp-page-auth main .container::before {
+  content: "ACCESS NODE // AUTH";
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--cp-red);
+  margin-bottom: 0.75rem;
+}
+
+body.cp-page-auth .form-control {
+  animation: cp-field-in 0.5s ease both;
+}
+
+body.cp-page-auth .form-control:nth-of-type(1) { animation-delay: 0.2s; }
+body.cp-page-auth .form-control:nth-of-type(2) { animation-delay: 0.35s; }
+
+@keyframes cp-field-in {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+body.cp-page-auth::before {
+  content: "";
+  position: fixed;
+  bottom: 10%;
+  right: 5%;
+  width: 100px;
+  height: 100px;
+  background: url("/themes/core/static/cyberpunk/skull.png") center/contain no-repeat;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  animation: cp-skull-float 6s ease-in-out infinite;
+}
+
+/* ——— Challenges page ——— */
+
+body.cp-page-challenges .jumbotron {
+  background: transparent !important;
+  border: none !important;
+  padding: 1rem 0 !important;
+}
+
+body.cp-page-challenges .jumbotron h1 {
+  font-size: 1.5rem;
+  color: var(--cp-yellow) !important;
+  text-shadow: 0 0 20px var(--cp-glow-yellow);
+}
+
+body.cp-page-challenges #challenges-board {
+  position: relative;
+}
+
+body.cp-page-challenges .category-header h3 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.85rem;
+  color: var(--cp-cyan);
+  border-left: 3px solid var(--cp-yellow);
+  padding-left: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+body.cp-page-challenges .challenge-button {
+  opacity: 0;
+  animation: cp-challenge-in 0.45s ease both;
+}
+
+@keyframes cp-challenge-in {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+body.cp-page-challenges .challenge-button::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(252, 238, 10, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+body.cp-page-challenges .challenge-button:hover::after {
+  left: 150%;
+}
+
+/* ——— Scoreboard ——— */
+
+body.cp-page-challenges .jumbotron h1::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background: url("/themes/core/static/cyberpunk/icons/missions.png") center/contain no-repeat;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 6px var(--cp-glow-cyan));
+}
+
+body.cp-page-scoreboard .jumbotron h1::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background: url("/themes/core/static/cyberpunk/icons/leaderboard.png") center/contain no-repeat;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 6px var(--cp-glow-yellow));
+}
+
+/* ——— Shared ——— */
+
+.jumbotron {
+  background: var(--cp-bg-panel) !important;
+  border: 1px solid var(--cp-border-dim) !important;
+  border-radius: 0 !important;
+  color: var(--cp-text) !important;
+}
+
+.card {
+  background: var(--cp-bg-panel);
+  border: 1px solid var(--cp-border-dim);
+  border-radius: 0;
+  color: var(--cp-text);
+}
+
+.form-control,
+.form-select {
+  background: var(--cp-bg-panel-2) !important;
+  border: 1px solid var(--cp-border-dim) !important;
+  color: var(--cp-text) !important;
+  border-radius: 0 !important;
+  font-family: "Share Tech Mono", monospace !important;
+}
+
+.form-control:focus {
+  border-color: var(--cp-yellow) !important;
+  box-shadow: 0 0 0 2px var(--cp-glow-yellow), 0 0 16px var(--cp-glow-yellow) !important;
+}
+
+.modal-content {
+  background: var(--cp-bg-panel);
+  border: 1px solid var(--cp-border);
+  border-radius: 0;
+}
+
+.modal-header {
+  background: var(--cp-bg-panel-2);
+  border-bottom: 1px solid var(--cp-border-dim);
+}
+
+.modal-header .modal-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.85rem;
+  color: var(--cp-yellow);
+}
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--cp-text-dim);
+  --bs-table-border-color: var(--cp-border-dim);
+  --bs-table-hover-bg: rgba(252, 238, 10, 0.04);
+}
+
+.table thead th {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cp-cyan);
+  border-bottom: 1px solid var(--cp-border);
+}
+
+.alert-success {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: var(--cp-border);
+  color: var(--cp-cyan);
+}
+
+.alert-danger {
+  background: rgba(255, 0, 60, 0.08);
+  border-color: rgba(255, 0, 60, 0.4);
+  color: var(--cp-red);
+}
+
+.badge.bg-primary {
+  background: var(--cp-yellow) !important;
+  color: #000 !important;
+}
+
+.dropdown-menu {
+  background: var(--cp-bg-panel-2);
+  border: 1px solid var(--cp-border-dim);
+  border-radius: 0;
+}
+
+.footer {
+  background: rgba(5, 8, 14, 0.98);
+  border-top: 1px solid var(--cp-border-dim);
+  padding: 1rem 0;
+}
+
+.footer a[href*="ctfd.io"] { display: none; }
+
+.cp-footer {
+  text-align: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--cp-text-dim);
+}
+
+.cp-footer span { color: var(--cp-red); }
+
+pre, code {
+  background: var(--cp-bg-panel-2) !important;
+  color: var(--cp-cyan) !important;
+  border: 1px solid var(--cp-border-dim);
+  border-radius: 0;
+}
+
+.btn-close { filter: invert(1); }
+
+.text-muted { color: var(--cp-text-dim) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  #cp-loader { display: none; }
+}

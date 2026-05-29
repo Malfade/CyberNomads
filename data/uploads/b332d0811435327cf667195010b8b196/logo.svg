@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 40" fill="none">
+  <text x="0" y="30" font-family="monospace" font-size="26" font-weight="700" fill="#fcee0a" letter-spacing="2">CYBERNOMADS</text>
+  <rect x="0" y="36" width="120" height="2" fill="#00f0ff"/>
+  <rect x="125" y="36" width="40" height="2" fill="#ff003c" opacity="0.8"/>
+</svg>
