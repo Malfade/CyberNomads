@@ -167,6 +167,7 @@
     if (pageType() !== "auth") return;
     var container = document.querySelector("main > .container");
     if (!container || container.classList.contains("cp2077-wrapped")) return;
+    if (!container.querySelector("form")) return;
 
     var jumbotron = document.querySelector("main .jumbotron");
     var titleEl = jumbotron ? jumbotron.querySelector("h1") : null;

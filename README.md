@@ -138,11 +138,22 @@ python3 scripts/apply-branding.py
 **Порт 8000 занят**  
 Измените в `docker-compose.yml` строку `"8000:8000"` на `"8080:8000"` и обновите `BASE_URL` в `scripts/apply-branding.py`.
 
+**500 на /login или /admin**  
+Часто из‑за пустого `ctf_logo` или прав на `data/uploads`. На сервере:
+```bash
+docker compose logs ctfd --tail 50
+bash scripts/fix-permissions.sh
+docker compose restart ctfd
+sleep 20
+python3 scripts/apply-branding.py
+```
+
 **Сброс к чистой установке**  
 ```bash
 docker compose down
 rm -rf data/
 docker compose up -d
+bash scripts/fix-permissions.sh
 python3 scripts/apply-branding.py
 ```
 
