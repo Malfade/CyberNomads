@@ -136,45 +136,26 @@ def upload_path_for(filename: str, data: bytes) -> str:
     return f"{digest}/{filename}"
 
 
-def upload_file_api(session: requests.Session, path: Path) -> str:
-    headers = api_headers(session)
-    headers.pop("Content-Type", None)
-    with path.open("rb") as handle:
-        resp = session.post(
-            f"{BASE_URL}/api/v1/files",
-            files={"file": (path.name, handle)},
-            headers=headers,
-        )
-    if resp.status_code not in (200, 201):
-        raise RuntimeError(f"File upload failed: {resp.status_code} {resp.text}")
-    data = resp.json()
-    location = data.get("data", {}).get("location") or data.get("data", {}).get("url")
-    if not location:
-        raise RuntimeError(f"Unexpected upload response: {data}")
-    return location
-
-
 def sync_logos(session: requests.Session) -> None:
-    # Empty ctf_logo breaks some CTFd pages (500). Use 1×1 transparent PNG; hide via CSS.
+    # Write into data/uploads (mounted as /var/uploads). Do not use /api/v1/files —
+    # that endpoint is for challenge attachments only.
     logo = ASSETS / "logo-transparent.png"
     if not logo.exists():
         logo = ASSETS / "favicon.png"
     if logo.exists():
-        try:
-            patch_config(session, "ctf_logo", upload_file_api(session, logo))
-        except RuntimeError:
-            patch_config(session, "ctf_logo", upload_path_for(logo.name, logo.read_bytes()))
+        patch_config(
+            session,
+            "ctf_logo",
+            upload_path_for(logo.name, logo.read_bytes()),
+        )
 
     favicon = ASSETS / "favicon.png"
     if favicon.exists():
-        try:
-            patch_config(session, "ctf_small_icon", upload_file_api(session, favicon))
-        except RuntimeError:
-            patch_config(
-                session,
-                "ctf_small_icon",
-                upload_path_for(favicon.name, favicon.read_bytes()),
-            )
+        patch_config(
+            session,
+            "ctf_small_icon",
+            upload_path_for(favicon.name, favicon.read_bytes()),
+        )
 
 
 def patch_config(session: requests.Session, key: str, value: str) -> None:
@@ -301,6 +282,7 @@ def main() -> int:
 
     print("Setting logos...")
     sync_logos(session)
+    print("  (if icons 404: run bash scripts/fix-permissions.sh)")
 
     print("Updating homepage...")
     patch_homepage(session)
