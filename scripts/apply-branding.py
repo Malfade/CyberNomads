@@ -82,7 +82,7 @@ HOMEPAGE_HTML = """\
         <div class="cp2077-level">T3</div>
         <div class="cp2077-level">T4</div>
       </div>
-      <img class="cp2077-skull" src="/themes/core/static/cyberpunk/skull.png" alt="" />
+      <img class="cp2077-skull" src="/themes/core/static/cyberpunk/hood-yellow.png" alt="" />
     </aside>
   </div>
 </div>
@@ -133,14 +133,10 @@ def upload_path_for(filename: str, data: bytes) -> str:
 
 
 def sync_logos(session: requests.Session) -> None:
-    logo = ASSETS / "logo.png"
-    if not logo.exists():
-        logo = ASSETS / "logo.svg"
+    # Navbar logo removed — text-only brand
+    patch_config(session, "ctf_logo", "")
+
     favicon = ASSETS / "favicon.png"
-
-    if logo.exists():
-        patch_config(session, "ctf_logo", upload_path_for(logo.name, logo.read_bytes()))
-
     if favicon.exists():
         patch_config(
             session,

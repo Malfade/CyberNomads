@@ -24,6 +24,7 @@
   --cp-glow-cyan: rgba(0, 240, 255, 0.25);
   --cp-glow-yellow: rgba(252, 238, 10, 0.2);
   --cp-glow-red: rgba(255, 0, 60, 0.2);
+  --cp-glow-green: rgba(0, 255, 180, 0.35);
 
   --theme-color: var(--cp-yellow);
   --bs-body-bg: var(--cp-bg);
@@ -288,10 +289,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-brand .ctf_logo {
-  height: 36px !important;
-  width: auto;
-  filter: drop-shadow(0 0 8px var(--cp-glow-yellow));
-  image-rendering: pixelated;
+  display: none !important;
+}
+
+.navbar-brand {
+  font-family: "Orbitron", sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.18em !important;
+  color: var(--cp-yellow) !important;
+  text-shadow: 0 0 12px var(--cp-glow-yellow);
+  text-transform: uppercase;
 }
 
 .navbar-dark .navbar-nav .nav-link {
@@ -467,7 +475,7 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 120px;
   margin: 1rem auto 0;
   opacity: 0.75;
-  filter: drop-shadow(0 0 12px var(--cp-glow-red));
+  filter: drop-shadow(0 0 12px var(--cp-glow-yellow));
   animation: cp-skull-float 5s ease-in-out infinite;
 }
 
@@ -647,7 +655,7 @@ body.cp-page-auth::before {
   right: 5%;
   width: 100px;
   height: 100px;
-  background: url("/themes/core/static/cyberpunk/skull.png") center/contain no-repeat;
+  background: url("/themes/core/static/cyberpunk/hood-yellow.png") center/contain no-repeat;
   opacity: 0.15;
   pointer-events: none;
   z-index: 0;
