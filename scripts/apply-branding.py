@@ -2,13 +2,16 @@
 """Apply cyberpunk CTF theme to CTFd."""
 
 import hashlib
+import os
 import re
 import sys
+import time
 from pathlib import Path
 
 import requests
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.environ.get("CTFD_URL", "http://localhost:8000")
+WAIT_TIMEOUT = int(os.environ.get("CTFD_WAIT", "60"))
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "branding" / "assets" / "cyberpunk"
 CSS_FILE = ROOT / "branding" / "cyberpunk.css"
@@ -169,8 +172,46 @@ def patch_homepage(session: requests.Session) -> None:
         raise RuntimeError(f"Failed to update homepage: {resp.status_code}")
 
 
+def wait_for_ctfd(timeout: int = WAIT_TIMEOUT) -> None:
+    deadline = time.time() + timeout
+    attempt = 0
+
+    while time.time() < deadline:
+        attempt += 1
+        try:
+            resp = requests.get(f"{BASE_URL}/login", timeout=3)
+            if resp.status_code < 500:
+                if attempt > 1:
+                    print(f"CTFd ready at {BASE_URL}")
+                return
+        except requests.RequestException:
+            pass
+
+        if attempt == 1:
+            print(f"Waiting for CTFd at {BASE_URL}...")
+        time.sleep(2)
+
+    print(
+        f"\nCTFd is not reachable at {BASE_URL}\n"
+        "Start containers first:\n"
+        "  docker compose up -d\n"
+        "Then wait ~15–30 sec and run this script again:\n"
+        "  python3 scripts/apply-branding.py",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
+
+
 def login(session: requests.Session) -> None:
-    resp = session.get(f"{BASE_URL}/login")
+    try:
+        resp = session.get(f"{BASE_URL}/login", timeout=10)
+    except requests.ConnectionError as exc:
+        print(
+            f"\nCannot connect to {BASE_URL}\n"
+            "Run `docker compose up -d` before apply-branding.py",
+            file=sys.stderr,
+        )
+        raise SystemExit(1) from exc
     nonce = extract_nonce(resp.text)
     if not nonce:
         raise RuntimeError("Could not extract CSRF nonce")
@@ -190,6 +231,7 @@ def main() -> int:
             return 1
 
     session = requests.Session()
+    wait_for_ctfd()
     print("Logging in...")
     login(session)
 

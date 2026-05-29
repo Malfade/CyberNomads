@@ -15,14 +15,19 @@ pip install requests
 ## Быстрый запуск
 
 ```bash
-cd /path/to/60297002
+cd ~/CyberNomads   # или путь к проекту
 
-# Поднять CTFd, MariaDB и Redis
+# 1. Поднять CTFd, MariaDB и Redis
 docker compose up -d
 
-# Дождаться готовности (15–30 сек), затем применить тему
+# 2. Дождаться готовности и применить тему
 python3 scripts/apply-branding.py
 ```
+
+> **Важно:** `apply-branding.py` работает только когда CTFd уже запущен.
+> После `docker compose down` сначала снова выполните `docker compose up -d`.
+
+Скрипт сам ждёт CTFd до 60 секунд. Если не успел — повторите команду.
 
 Откройте в браузере: **http://localhost:8000**
 
@@ -116,8 +121,13 @@ sessionStorage.removeItem('cp-loaded')
 **CTFd не открывается сразу после старта**  
 Подождите 20–30 секунд и проверьте логи: `docker compose logs ctfd`
 
-**`apply-branding.py` падает с ошибкой login**  
-Убедитесь, что CTFd доступен на http://localhost:8000 и credentials в скрипте актуальны.
+**`apply-branding.py` падает с Connection refused**  
+CTFd не запущен. Выполните:
+```bash
+docker compose up -d
+python3 scripts/apply-branding.py
+```
+Проверить статус: `docker compose ps`
 
 **Порт 8000 занят**  
 Измените в `docker-compose.yml` строку `"8000:8000"` на `"8080:8000"` и обновите `BASE_URL` в `scripts/apply-branding.py`.
