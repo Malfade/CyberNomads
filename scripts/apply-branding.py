@@ -11,7 +11,8 @@ from pathlib import Path
 import requests
 
 BASE_URL = os.environ.get("CTFD_URL", "http://localhost:8000")
-WAIT_TIMEOUT = int(os.environ.get("CTFD_WAIT", "60"))
+WAIT_TIMEOUT = int(os.environ.get("CTFD_WAIT", "120"))
+WAIT_INTERVAL = 2
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "branding" / "assets" / "cyberpunk"
 CSS_FILE = ROOT / "branding" / "cyberpunk.css"
@@ -172,30 +173,44 @@ def patch_homepage(session: requests.Session) -> None:
         raise RuntimeError(f"Failed to update homepage: {resp.status_code}")
 
 
+def ctfd_is_ready() -> bool:
+    try:
+        resp = requests.get(f"{BASE_URL}/login", timeout=5)
+    except requests.RequestException:
+        return False
+
+    if resp.status_code >= 500:
+        return False
+
+    if extract_nonce(resp.text):
+        return True
+
+    return "/setup" in resp.url or "setup" in resp.text.lower()
+
+
 def wait_for_ctfd(timeout: int = WAIT_TIMEOUT) -> None:
     deadline = time.time() + timeout
     attempt = 0
+    printed = False
 
     while time.time() < deadline:
         attempt += 1
-        try:
-            resp = requests.get(f"{BASE_URL}/login", timeout=3)
-            if resp.status_code < 500:
-                if attempt > 1:
-                    print(f"CTFd ready at {BASE_URL}")
-                return
-        except requests.RequestException:
-            pass
+        if ctfd_is_ready():
+            if printed:
+                print(f"CTFd ready at {BASE_URL} (attempt {attempt})")
+            return
 
-        if attempt == 1:
-            print(f"Waiting for CTFd at {BASE_URL}...")
-        time.sleep(2)
+        if not printed:
+            print(f"Waiting for CTFd at {BASE_URL} (up to {timeout}s)...")
+            printed = True
+
+        time.sleep(WAIT_INTERVAL)
 
     print(
-        f"\nCTFd is not reachable at {BASE_URL}\n"
-        "Start containers first:\n"
-        "  docker compose up -d\n"
-        "Then wait ~15–30 sec and run this script again:\n"
+        f"\nCTFd is not ready at {BASE_URL} after {timeout}s\n"
+        "Check logs:\n"
+        "  docker compose logs -f ctfd\n"
+        "Then retry:\n"
         "  python3 scripts/apply-branding.py",
         file=sys.stderr,
     )
@@ -203,25 +218,46 @@ def wait_for_ctfd(timeout: int = WAIT_TIMEOUT) -> None:
 
 
 def login(session: requests.Session) -> None:
-    try:
-        resp = session.get(f"{BASE_URL}/login", timeout=10)
-    except requests.ConnectionError as exc:
-        print(
-            f"\nCannot connect to {BASE_URL}\n"
-            "Run `docker compose up -d` before apply-branding.py",
-            file=sys.stderr,
-        )
-        raise SystemExit(1) from exc
-    nonce = extract_nonce(resp.text)
-    if not nonce:
-        raise RuntimeError("Could not extract CSRF nonce")
-    resp = session.post(
-        f"{BASE_URL}/login",
-        data={"name": ADMIN_EMAIL, "password": ADMIN_PASSWORD, "nonce": nonce},
-        allow_redirects=True,
+    deadline = time.time() + 30
+    last_error: Exception | None = None
+
+    while time.time() < deadline:
+        try:
+            resp = session.get(f"{BASE_URL}/login", timeout=10)
+            nonce = extract_nonce(resp.text)
+            if not nonce:
+                time.sleep(WAIT_INTERVAL)
+                continue
+
+            resp = session.post(
+                f"{BASE_URL}/login",
+                data={
+                    "name": ADMIN_EMAIL,
+                    "password": ADMIN_PASSWORD,
+                    "nonce": nonce,
+                },
+                allow_redirects=True,
+                timeout=10,
+            )
+            if "login" in resp.url:
+                raise RuntimeError(
+                    "Login failed — check ADMIN_EMAIL / ADMIN_PASSWORD in apply-branding.py"
+                )
+            return
+        except RuntimeError:
+            raise
+        except requests.RequestException as exc:
+            last_error = exc
+            time.sleep(WAIT_INTERVAL)
+
+    print(
+        f"\nCannot connect to {BASE_URL} while logging in\n"
+        "Run `docker compose up -d`, wait ~30 sec, then retry.",
+        file=sys.stderr,
     )
-    if "login" in resp.url:
-        raise RuntimeError("Login failed")
+    if last_error:
+        raise SystemExit(1) from last_error
+    raise SystemExit(1)
 
 
 def main() -> int:

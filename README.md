@@ -27,7 +27,13 @@ python3 scripts/apply-branding.py
 > **Важно:** `apply-branding.py` работает только когда CTFd уже запущен.
 > После `docker compose down` сначала снова выполните `docker compose up -d`.
 
-Скрипт сам ждёт CTFd до 60 секунд. Если не успел — повторите команду.
+Скрипт сам ждёт готовности CTFd до **120 секунд** (включая `Connection reset`).
+Если не успел — проверьте логи: `docker compose logs -f ctfd`
+
+```bash
+# при медленном сервере можно увеличить ожидание
+CTFD_WAIT=180 python3 scripts/apply-branding.py
+```
 
 Откройте в браузере: **http://localhost:8000**
 
