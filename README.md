@@ -90,6 +90,8 @@ python3 scripts/apply-branding.py
 │   └── assets/cyberpunk/   # Логотип, иконки, фоны (монтируется в контейнер)
 ├── scripts/
 │   └── apply-branding.py   # Настройка темы через API CTFd
+├── challenges/             # Задания CTF: вложения + challenge.md (см. challenges/README.md)
+│   └── export/ctfd-db/     # JSON-дамп из бэкапа CTFd
 └── data/                   # Персистентные данные (не коммитить!)
     ├── mysql/              # База данных
     ├── uploads/            # Загруженные файлы

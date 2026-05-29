@@ -30,7 +30,7 @@ HOMEPAGE_HTML = """\
   <div class="cp2077-topbar">
     <div>
       <div class="cp2077-topbar-label">INTERFACE STYLES // CTF</div>
-      <h1 class="cp2077-title">CYBERNOMADS</h1>
+      <h1 class="cp2077-title cp-signal-glitch" data-text="CYBERNOMADS">CYBERNOMADS</h1>
       <p class="cp2077-subtitle">STYLE OVER SUBSTANCE</p>
     </div>
     <div class="cp2077-topbar-deco">
@@ -86,7 +86,9 @@ HOMEPAGE_HTML = """\
         <div class="cp2077-level">T3</div>
         <div class="cp2077-level">T4</div>
       </div>
-      <img class="cp2077-skull" src="/themes/core/static/cyberpunk/hood-yellow.png" alt="" />
+      <div class="cp-signal-glitch-wrap">
+        <img class="cp2077-skull cp-signal-glitch" src="/themes/core/static/cyberpunk/hood-yellow.png" alt="" />
+      </div>
     </aside>
   </div>
 </div>

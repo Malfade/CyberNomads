@@ -36,7 +36,7 @@
       '<div class="cp2077-frame cp-loader-panel">' +
       '<span class="cp2077-corner-br"></span><span class="cp2077-corner-bl"></span>' +
       '<img class="cp-loader-icon" src="/themes/core/static/cyberpunk/icons/thinking.png" alt="" />' +
-      '<div class="cp-loader-title">CYBERNOMADS</div>' +
+      '<div class="cp-loader-title cp-signal-glitch" data-text="CYBERNOMADS">CYBERNOMADS</div>' +
       '<div class="cp-loader-sub">NEO INTERFACE v2.077</div>' +
       '<div class="cp-loader-bar"><div class="cp-loader-bar-fill"></div></div>' +
       '<div class="cp-loader-status">SYNCING NEURAL LINK</div>' +
@@ -263,6 +263,24 @@
     addFrameCorners();
   }
 
+  function initSignalGlitch() {
+    var targets = document.querySelectorAll(".cp-signal-glitch");
+    if (!targets.length) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    function burst() {
+      targets.forEach(function (el) {
+        el.classList.add("cp-signal-burst");
+        setTimeout(function () {
+          el.classList.remove("cp-signal-burst");
+        }, 180 + Math.random() * 280);
+      });
+      setTimeout(burst, 1200 + Math.random() * 3500);
+    }
+
+    setTimeout(burst, 1500);
+  }
+
   function init() {
     localStorage.setItem("theme", "dark");
     document.documentElement.setAttribute("data-bs-theme", "dark");
@@ -274,6 +292,7 @@
     animateChallenges();
     fixChallengeModal();
     wrapAuthPanel();
+    initSignalGlitch();
   }
 
   if (document.readyState === "loading") {

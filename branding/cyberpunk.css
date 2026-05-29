@@ -212,7 +212,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--cp-yellow);
   letter-spacing: 0.2em;
   margin-bottom: 0.25rem;
-  animation: cp-glitch 4s infinite;
 }
 
 .cp-loader-sub {
@@ -245,10 +244,224 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.2em;
 }
 
-@keyframes cp-glitch {
-  0%, 92%, 100% { transform: none; text-shadow: none; }
-  93% { transform: translate(-2px, 0); text-shadow: 2px 0 var(--cp-red); }
-  95% { transform: translate(2px, 0); text-shadow: -2px 0 var(--cp-cyan); }
+/* ——— Signal loss / interference glitch ——— */
+
+.cp-signal-glitch {
+  position: relative;
+}
+
+.cp-signal-glitch[data-text]::before,
+.cp-signal-glitch[data-text]::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cp-signal-glitch[data-text]::before {
+  color: var(--cp-cyan);
+  clip-path: inset(0 0 58% 0);
+  animation: cp-signal-chroma-a 3.4s infinite steps(1);
+}
+
+.cp-signal-glitch[data-text]::after {
+  color: var(--cp-red);
+  clip-path: inset(42% 0 0 0);
+  animation: cp-signal-chroma-b 3.1s infinite steps(1);
+}
+
+.cp2077-title.cp-signal-glitch {
+  display: inline-block;
+  animation: cp-signal-title 3.6s infinite;
+}
+
+.cp2077-title.cp-signal-glitch[data-text]::before,
+.cp2077-title.cp-signal-glitch[data-text]::after {
+  font-family: "Orbitron", sans-serif;
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+}
+
+.cp-loader-title.cp-signal-glitch {
+  display: inline-block;
+  animation: cp-signal-title 3.6s infinite;
+}
+
+.cp-loader-title.cp-signal-glitch[data-text]::before,
+.cp-loader-title.cp-signal-glitch[data-text]::after {
+  font-family: "Orbitron", sans-serif;
+  font-size: inherit;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.cp-signal-glitch-wrap {
+  position: relative;
+  margin-top: 1rem;
+  animation: cp-skull-float 5s ease-in-out infinite;
+}
+
+.cp-signal-glitch-wrap::before,
+.cp-signal-glitch-wrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--cp-yellow);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 0 8px var(--cp-glow-yellow);
+}
+
+.cp-signal-glitch-wrap::before {
+  top: 28%;
+  animation: cp-signal-scan 3.8s infinite;
+}
+
+.cp-signal-glitch-wrap::after {
+  top: 62%;
+  animation: cp-signal-scan 3.8s infinite 0.15s;
+}
+
+.cp2077-skull.cp-signal-glitch {
+  position: relative;
+  z-index: 1;
+  animation: cp-signal-skull 4.2s infinite;
+}
+
+.cp-signal-glitch.cp-signal-burst {
+  animation-duration: 0.12s !important;
+}
+
+.cp-signal-glitch.cp-signal-burst[data-text]::before,
+.cp-signal-glitch.cp-signal-burst[data-text]::after {
+  opacity: 0.9 !important;
+}
+
+@keyframes cp-signal-chroma-a {
+  0%, 84%, 100% { opacity: 0; transform: translate(0); }
+  85% { opacity: 0.85; transform: translate(-5px, 1px); }
+  86% { opacity: 0; }
+  87% { opacity: 0.7; transform: translate(4px, -1px); }
+  88% { opacity: 0; }
+  91% { opacity: 0.9; transform: translate(-8px, 0); }
+  92% { opacity: 0; }
+}
+
+@keyframes cp-signal-chroma-b {
+  0%, 83%, 100% { opacity: 0; transform: translate(0); }
+  84% { opacity: 0.8; transform: translate(6px, -1px); }
+  85% { opacity: 0; }
+  88% { opacity: 0.75; transform: translate(-4px, 2px); }
+  89% { opacity: 0; }
+  92% { opacity: 0.85; transform: translate(7px, 0); }
+  93% { opacity: 0; }
+}
+
+@keyframes cp-signal-title {
+  0%, 78%, 100% {
+    opacity: 1;
+    transform: none;
+    text-shadow: 0 0 30px var(--cp-glow-yellow);
+    filter: none;
+    clip-path: none;
+  }
+  79% {
+    opacity: 0.25;
+    transform: translateX(-4px) skewX(-1deg);
+    text-shadow: -4px 0 var(--cp-red), 4px 0 var(--cp-cyan);
+    filter: blur(0.4px);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(5px);
+    clip-path: inset(12% 0 55% 0);
+  }
+  81% {
+    opacity: 0.1;
+    clip-path: inset(48% 0 18% 0);
+    transform: translateX(-3px);
+  }
+  82% {
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+  }
+  86% {
+    opacity: 0.55;
+    letter-spacing: 0.14em;
+    text-shadow: 0 0 8px #fff, 0 0 20px var(--cp-glow-yellow);
+  }
+  87% { opacity: 1; letter-spacing: 0.08em; }
+  94% {
+    opacity: 0.4;
+    transform: translateX(2px);
+    text-shadow: 3px 0 var(--cp-cyan), -3px 0 var(--cp-red);
+  }
+  95% { opacity: 1; transform: none; }
+}
+
+@keyframes cp-signal-skull {
+  0%, 76%, 100% {
+    opacity: 0.75;
+    transform: translateX(0);
+    filter: drop-shadow(0 0 12px var(--cp-glow-yellow));
+    clip-path: none;
+  }
+  77% {
+    opacity: 0.2;
+    transform: translateX(-5px);
+    filter: drop-shadow(-3px 0 var(--cp-red)) drop-shadow(3px 0 var(--cp-cyan)) blur(0.5px);
+    clip-path: inset(8% 0 72% 0);
+  }
+  78% {
+    opacity: 0.9;
+    transform: translateX(4px);
+    clip-path: inset(55% 0 12% 0);
+  }
+  79% {
+    opacity: 0.15;
+    clip-path: inset(30% 0 35% 0);
+    transform: translateX(-2px);
+  }
+  80% {
+    opacity: 0.75;
+    clip-path: none;
+    transform: translateX(0);
+    filter: drop-shadow(0 0 12px var(--cp-glow-yellow));
+  }
+  88% {
+    opacity: 0.35;
+    transform: translateX(3px) scaleX(1.04);
+    filter: drop-shadow(0 0 4px var(--cp-cyan)) brightness(1.3);
+  }
+  89% { opacity: 0.75; transform: translateX(0); }
+}
+
+@keyframes cp-signal-scan {
+  0%, 81%, 100% { opacity: 0; transform: scaleX(0.2); }
+  82% { opacity: 0.9; transform: scaleX(1); }
+  83% { opacity: 0; }
+  90% { opacity: 0.7; transform: scaleX(0.85); }
+  91% { opacity: 0; }
+}
+
+.cp-signal-glitch.cp-signal-burst {
+  opacity: 0.35 !important;
+}
+
+.cp2077-skull.cp-signal-glitch.cp-signal-burst {
+  opacity: 0.2 !important;
+  filter: drop-shadow(0 0 20px var(--cp-red)) blur(1px) !important;
+  transform: translateX(-6px) !important;
 }
 
 .cp-scanlines {
@@ -354,6 +567,7 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 0 0 30px var(--cp-glow-yellow);
   margin: 0.25rem 0 0;
   line-height: 1.1;
+  isolation: isolate;
 }
 
 .cp2077-subtitle {
@@ -473,10 +687,9 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   width: 100%;
   max-width: 120px;
-  margin: 1rem auto 0;
+  margin: 0 auto;
   opacity: 0.75;
   filter: drop-shadow(0 0 12px var(--cp-glow-yellow));
-  animation: cp-skull-float 5s ease-in-out infinite;
 }
 
 @keyframes cp-skull-float {

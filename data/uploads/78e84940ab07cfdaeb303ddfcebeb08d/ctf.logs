@@ -1,0 +1,10 @@
+Mar  3 10:12:45 server01 sshd[1234]: Accepted password for user admin from 192.168.1.100 port 54321 ssh2
+Mar  3 10:12:47 server01 sshd[1234]: session opened for user admin by (uid=1000)
+Mar  3 10:12:55 server01 kernel: [17345.345678] device eth0 entered promiscuous mode
+Mar  3 10:13:04 server01 sudo:   admin : TTY=pts/1 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/cat /etc/passwd
+Mar  3 10:13:08 server01 sudo:   admin : TTY=pts/1 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/echo "flag{pass_leak123!@}" >> /tmp/secret
+Mar  3 10:13:12 server01 systemd[1]: Starting Daily apt upgrade and clean activities...
+Mar  3 10:13:25 server01 audit[5678]: USER_AUTH pid=5678 uid=1000 auid=1000 msg='op=PAM:authentication grantor=? acct="admin" exe="/usr/bin/sudo" hostname=? addr=? terminal=pts/1 res=success'
+Mar  3 10:13:29 server01 kernel: [17355.456789] TCP: request_sock_TCP: Possible SYN flooding on port 22. Dropping request.
+Mar  3 10:13:35 server01 systemd[1]: Finished Daily apt upgrade and clean activities.
+Mar  3 10:13:40 server01 sshd[6789]: Connection closed by 192.168.1.100 port 54321 [preauth]
