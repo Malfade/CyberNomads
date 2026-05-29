@@ -140,12 +140,41 @@
     window.addEventListener("resize", init);
   }
 
+  function fixChallengeModal() {
+    if (pageType() !== "challenges") return;
+
+    function syncModalState() {
+      var open = document.querySelector(".modal.show");
+      document.body.classList.toggle("cp-modal-open", !!open);
+    }
+
+    document.addEventListener("show.bs.modal", syncModalState);
+    document.addEventListener("hidden.bs.modal", syncModalState);
+
+    new MutationObserver(syncModalState).observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && document.body.classList.contains("cp-modal-open")) {
+        var modal = document.querySelector(".modal.show");
+        if (modal && window.bootstrap && bootstrap.Modal) {
+          var inst = bootstrap.Modal.getInstance(modal);
+          if (inst) inst.hide();
+        }
+      }
+    });
+  }
+
   function animateChallenges() {
     if (pageType() !== "challenges") return;
 
     function staggerButtons() {
       var buttons = document.querySelectorAll(
-        ".challenge-button:not(.cp-animated)"
+        "#challenges-board .challenge-button:not(.cp-animated)"
       );
       buttons.forEach(function (btn, i) {
         btn.classList.add("cp-animated");
@@ -243,6 +272,7 @@
     addFrameCorners();
     initParticles();
     animateChallenges();
+    fixChallengeModal();
     wrapAuthPanel();
   }
 

@@ -255,7 +255,7 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 9998;
+  z-index: 1040;
   background: repeating-linear-gradient(
     0deg, transparent, transparent 2px,
     rgba(0, 0, 0, 0.04) 2px, rgba(0, 0, 0, 0.04) 4px
@@ -807,7 +807,7 @@ body.cp-page-challenges .category-header h3 {
   margin-bottom: 1rem;
 }
 
-body.cp-page-challenges .challenge-button {
+body.cp-page-challenges #challenges-board .challenge-button {
   opacity: 0;
   animation: cp-challenge-in 0.45s ease both;
 }
@@ -817,7 +817,7 @@ body.cp-page-challenges .challenge-button {
   to { opacity: 1; transform: translateX(0); }
 }
 
-body.cp-page-challenges .challenge-button::after {
+body.cp-page-challenges #challenges-board .challenge-button::after {
   content: "";
   position: absolute;
   top: 0; left: -100%;
@@ -826,8 +826,77 @@ body.cp-page-challenges .challenge-button::after {
   transition: left 0.5s ease;
 }
 
-body.cp-page-challenges .challenge-button:hover::after {
+body.cp-page-challenges #challenges-board .challenge-button:hover::after {
   left: 150%;
+}
+
+/* ——— Challenge modal (must stay above theme overlays) ——— */
+
+body.cp-modal-open .cp-scanlines,
+body.cp-modal-open #cp-particles {
+  z-index: 0 !important;
+  opacity: 0.12;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
+
+.modal {
+  z-index: 1055 !important;
+}
+
+.modal-content {
+  background: var(--cp-bg-panel);
+  border: 1px solid var(--cp-border);
+  border-radius: 0;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.modal-header {
+  background: var(--cp-bg-panel-2);
+  border-bottom: 1px solid var(--cp-border-dim);
+}
+
+.modal-header .btn-close {
+  opacity: 1 !important;
+  padding: 0.85rem;
+  margin: 0;
+  filter: invert(1) brightness(1.2);
+  pointer-events: auto;
+  z-index: 2;
+  position: relative;
+}
+
+.modal-header .modal-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.85rem;
+  color: var(--cp-yellow);
+}
+
+.modal-body {
+  pointer-events: auto;
+}
+
+.modal .btn-primary {
+  clip-path: none !important;
+  padding: 0.55rem 1.25rem !important;
+  white-space: nowrap;
+  min-width: 7rem;
+}
+
+.modal .form-control {
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+.modal .challenge-button,
+.modal .btn {
+  opacity: 1 !important;
+  animation: none !important;
+  transform: none !important;
 }
 
 /* ——— Scoreboard ——— */
@@ -884,23 +953,6 @@ body.cp-page-scoreboard .jumbotron h1::before {
 .form-control:focus {
   border-color: var(--cp-yellow) !important;
   box-shadow: 0 0 0 2px var(--cp-glow-yellow), 0 0 16px var(--cp-glow-yellow) !important;
-}
-
-.modal-content {
-  background: var(--cp-bg-panel);
-  border: 1px solid var(--cp-border);
-  border-radius: 0;
-}
-
-.modal-header {
-  background: var(--cp-bg-panel-2);
-  border-bottom: 1px solid var(--cp-border-dim);
-}
-
-.modal-header .modal-title {
-  font-family: "Orbitron", sans-serif;
-  font-size: 0.85rem;
-  color: var(--cp-yellow);
 }
 
 .table {
